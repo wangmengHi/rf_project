@@ -1,0 +1,21 @@
+*** Settings ***
+Library               json
+Library               requests
+Library               collections
+Library               RequestsLibrary
+Library               Collections
+Library               DatabaseLibrary
+Library               pymysql
+
+*** Test Cases ***
+edit_intimate_purchase_activity
+        Create Session        api        https://tmoses.ofashion.com.cn
+        ${data}        Get Request        api        /get_latest_goods_list?start=0&count=20&seller_uid=97947&login_uid=34350234&dim=02:00:00:00:00:00&networkType=WIFI&diu=359583076232513&sign=3499cf892ebbdcf57c7a82305a06ff55&source=2&did=1080,1920,Samsung%20SM-G9350,7.0&djb=2&format=json&nounce=000000&div=3.9.0&dic=android_developer&authid=34350234&no_check=1
+        Should Be Equal As Integers        ${data.status_code}        200
+        Should Contain        ${data.content}        goods_channel
+        Should Be Equal As Strings        ${data[orginal][]}
+        Connect To Database Using Custom Params        pymysql        database='mfashion',user='mfashion',password='Mfashion888',host='rm-bp1d8y0t9t7umzt03o.mysql.rds.aliyuncs.com',port=3306
+        Table Must Exist        brand_info        True
+        Check If Exists In Database        SELECT * FROM brand_info WHERE bid='10038'        #pass
+        Check If Not Exists In Database        SELECT * FROM brand_info WHERE bid='100381'        #faild
+        Disconnect From Database
