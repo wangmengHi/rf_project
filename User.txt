@@ -1,0 +1,19 @@
+*** Settings ***
+Library               json
+Library               requests
+Library               collections
+Library               RequestsLibrary
+Library               Collections
+Library               DatabaseLibrary
+Library               pymysql
+
+*** Test Cases ***
+login_account
+        ${data}        set Variable        {"mobilephone":"15971456284","countrycode":"86","password":"123456"}
+        ${url}        set Variable        https://tmoses.ofashion.com.cn/login_account?no_check=1
+        ${dict}        create Dictionary        Host=tmoses.ofashion.com.cn        Content-Type=application/json
+        Create Session        login_account        https://tmoses.ofashion.com.cn        ${dict}
+        ${result1}        Post Request        login_account        ${url}        ${data}        headers=${dict}
+        log        ${result1}
+        ${result2}        To Json        ${result1.content}
+        log        ${result2[u'original'][u'status']}

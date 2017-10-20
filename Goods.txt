@@ -1,0 +1,56 @@
+*** Settings ***
+Library               Collections
+Library               json
+Library               requests
+Library               RequestsLibrary
+Library               HttpLibrary.HTTP
+
+*** Variables ***
+&{hosts}              dfc=http://tmoses.ofashion.com.cn
+
+*** Test Cases ***
+get_goods_detail_new
+        Create Session        api        ${domain}
+        ${data}        Get Request        api        /get_goods_detail_new?gid=90566727605656&no_check=1&login_uid=214441&div=3.9.0&source=1
+        Should contain        ${data.content}        updatetime
+        log        ${data.content}
+        ${result}        To Json        ${data.content}        #用to json转成json格式
+        log        ${result}
+
+*** Keywords ***
+MoGet
+        [Arguments]        ${apiurl}        ${type}==json        ${params}==${EMPTY}
+        #设置代理，用于调试
+        ${proxy}        set variable        https://tmoses.ofashion.com.cn
+        #根据tag来获取host
+        : FOR        ${tag}        IN        @{TEST TAGS}
+        \        ${host}        Evaluate        ${hosts}.get($tag,"")
+        \        Run Keyword If        "${host}"!=""        Exit For Loop
+        log        ${host}
+        #根据提交数据格式,设置Content-Type
+        ${top}        Run Keyword If        "${type}"=="form"        Create Dictionary        Content-Type=application/x-www-form-urlencoded        TT=${TT}
+        ...        ELSE        Create Dictionary        Content-Type=application/json        TT=${TT}
+        Create Session        api        ${host}        ${top}
+        ${resget}        Get Request        api        ${apiurl}        params=${params}
+        Should Be Equal As Strings        ${resget.status_code}        200
+        log        ${resget.status_code}
+        ${resj}        To Json        ${resget.content}
+        log        ${resj}
+
+MoPost
+        [Arguments]        ${apiurl}        ${type}==json        ${params}==${EMPTY}
+        #设置代理，抓包
+        ${proxy}        Set Variable        http://127.0.0.1:8888/
+        #根据tag来获取host
+        : FOR        ${tag}        IN        @{TEST TAGS}
+        \        ${host}        Evaluate        ${hosts}.get($tag,"")
+        \        Run Keyword If        "${host}"!=""        Exit For Loop
+        log        ${host}
+        #根据提交数据格式,设置Content-Type
+        ${top}        Run Keyword If        "${type}"=="json"        Create Dictionary        Content-Type=application/json        TT=${TT}
+        ...        ELSE IF        "${type}"=="form"        Cre ate Dictionary        Content-Type=application/x-www-form-urlencoded        TT=${TT}
+        Create Session        api        ${host}        ${top}
+        ${respost}        Post Request        api        ${apiurl}        params=${params}
+        Should Be Equal As Strings        ${respost.status_code}        200
+        ${resj}        To Json        ${respost.content}
+        log        ${resj}
