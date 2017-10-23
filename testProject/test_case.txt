@@ -1,0 +1,31 @@
+*** Settings ***
+Library           requests    # robotframework-requests依赖这个request
+Library           RequestsLibrary    # 封装的http关键字用到此类库
+Library           DatabaseLibrary    # 操作数据库
+Library           pymysql    # 操作Mysql数据库
+Library           HttpLibrary    # 为了使用该库的json关键字,对json操作相当方便
+
+*** Variables ***
+${host}           https://tmoses.ofashion.com.cn    #域名
+
+*** Test Cases ***
+mysql_connect
+    Connect To Database Using Custom Params    pymysql    database='mfashion',user='mfashion',password='Mfashion888',host='rm-bp1d8y0t9t7umzt03o.mysql.rds.aliyuncs.com',port=3306
+    Execute Sql String    select * from product_info where model='04ea68212e287f47e8dba11b6d847121'
+    ${string}    query    select distinct(color) from product_sku where spu_id='2bc699f5a11c8488e2f7cff698b47af1'
+    log    ${string}
+    log    ${string[0][0]}
+    log    ${string[1][0]}
+    log    ${string[2][0]}
+    should be equal    ${string[0][0]}    blue
+    Disconnect From Database
+
+get_trade_detail_2
+    create session    session    ${host}    #创建一个连接到服务器的host
+    ${result}    get request    session    /get_trade_detail?trade_no=01171019172565000004&no_check=1&login_uid=214441&div=3.9.0&source=1    #发起get 请求
+    Should Be Equal As Strings    ${result.status_code}    200    #status_recode是否是200
+    ${content}    to json    ${result.content}    #转换成json文本格式
+    log    ${content}
+    log    ${result.content}
+    should contain    ${content['original']['trade_detail']}    updatetime    #是否包含updatetime
+    should not be empty    ${content['original']['trade_detail']}    \    #某个字段是否为空

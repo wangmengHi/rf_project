@@ -1,0 +1,37 @@
+*** Settings ***
+Documentation     BuiltIn库的case
+Library           BuiltIn
+Library           ../../project/test/02.py
+
+*** Test Cases ***
+call method
+    ${test}    create test
+    call method    ${test}    ttt
+
+catenate
+    ${str1}    catenate    Hello    World
+    ${str2}    catenate    SEPARATOR=-    HELLO    WORLD
+    ${STR3}    catenate    SEPARATOR=    world    hello
+    log    ${str1}
+    log    ${str2}
+    log    ${STR3}
+
+comment
+
+continue for loop
+    : FOR    ${item}    IN RANGE    4
+    \    run keyword if    ${item}==2    continue for loop
+    \    log    ${item}
+
+continue for loop if
+    : FOR    ${item}    IN RANGE    5
+    \    continue for loop if    ${item}==2
+    \    log    ${item}
+
+convert to
+    Convert To Integer    1
+    Convert To Number    10.0
+    ${a}    set variable    100
+    Convert To Integer    ${a}
+    ${b}    set variable    42.200
+    ${c}    Convert To Number    12.5679    2

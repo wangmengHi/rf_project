@@ -1,0 +1,81 @@
+*** Settings ***
+Library           Selenium2Library
+Library           json
+Library           Collections
+Library           BuiltIn
+Library           DatabaseLibrary
+Library           requests
+Library           RequestsLibrary
+
+*** Variables ***
+${a}              1
+@{b}              1    2    3
+
+*** Test Cases ***
+baidu_search
+    Open Browser    http://www.baidu.com    chrome
+    Input Text    id=kw    robotframework
+    Click Button    id=su
+    sleep    2
+    close Browser
+
+keywords01
+    log    hello world    #log打印hello world
+    ${a}    set variable    hello world2    #set variable 定义变量
+    log    ${a}
+    ${hi}    catenate    w    m    #catenate连接多个信息
+    log    ${hi}
+    ${hi2}    catenate    SEPARATOR=---    HI    2    #separator对多个连接信息分割
+    log    ${hi2}
+
+list
+    ${list}    create list    a    b    c    #create list 定义列表
+    log    ${list}
+    @{list2}    create list    a    b    c
+    log many    @{list2}    #@{}”去定义列表的话,可以通过“log many”关键字进行打印
+
+time
+    ${t}    get time    hello world    #get time获取当前时间
+    log    ${t}
+    sleep    5    #sleep设置休眠时间
+    ${t2}    get time
+    log    ${t2}
+
+if
+    ${a}    set variable    98
+    run keyword if    ${a}>=90    log    优秀
+    ...    ELSE IF    ${a}>=70    log    良好
+    ...    ELSE IF    ${a}>=60    log    及格
+    ...    ELSE    ${a}<60    log    不及格    # run keyword if 编写if分支语句    #注意开头的...
+
+for
+    : FOR    ${i}    IN RANGE    10    #:for”定义 for 循环
+    \    log    ${i}
+
+for-list
+    @{list}    create list    a    b    c
+    : FOR    ${i}    IN    @{list}
+    \    Exit For Loop If    '${i}'=='b'
+    log    ${i}
+    #通过“Exit For Loop If”关键字时行 for 循环内的判断,当满足 Exit For Loop If 条件后,循环结束。
+
+random
+    ${d}    Evaluate    random.randint(1000,9999)    random
+    log    ${d}
+
+dict
+    ${dict}    create dictionary    a    1    b    2    #Get Dictionary Items 关键字用于读取字典的 key 和 value
+    ${items}    get dictionary items    ${dict}    #Get Dictionary Items 关键字获取字典中的 key 和 value
+    log    ${items}
+    ${key}    get dictionary keys    ${dict}    #Get Dictionary Keys 关键字获取字典中的 key
+    log    ${key}
+    ${value}    get dictionary values    ${dict}    #Get Dictionary Values 关键字获取字典中的 value
+    log    ${value}
+    ${v}    get from dictionary    ${dict}    b    #Get From Dictionary 关键字获取字典中的 key 对应的 value
+    log    ${v}
+
+shouye
+    ${url}    set variable    https://tmoses.ofashion.com.cn/wechat_home?no_check=1&source=10&count=20&start=0
+    ${response}    requests.get    ${url}
+    ${content}    to json    ${response.content}
+    log    ${content['original']['data']['resource_list']}

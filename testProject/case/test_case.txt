@@ -1,0 +1,84 @@
+*** Settings ***
+Resource          newResource.txt
+
+*** Test Cases ***
+set variable
+    ${value}    set variable    abcd
+    ${value2}    set variable if    '${value}'=='abcd'    efgh    ace
+    #第二个变量判断第一个变量的值是否等于第一个，是，返回efgh,不是返回ace
+    ${getvalue}    get length    ${value}
+    ${getTime}    get time
+    log    ${value}
+    log    0123${value}
+
+get
+    #见set variable
+
+evaluate
+    ${a}    set variable    100
+    ${b}    evaluate    ${a}+10
+
+case-2-8-3
+    @{a}    set variable    1    2    3
+    @{b}    create list    3    2    1
+    run keyword    log    abc    warn
+    @{list}    create list    abcd    WARN
+    ${keyword}    set variable    log
+    run keyword    ${keyword}    @{list}
+    # 一维list
+    @{useList}    create list    a    b    c
+    log    @{useList}[1]
+    log    ${useList[1]}
+    #二维list
+    @{listA}    create list    a    b    c
+    @{listB}    create list    1    2    3
+    @{listC}    create list    ${listA}    ${listB}    5    #注意给@{listC}赋值时，listA和listB用$
+    log    @{listC[0]}[1]
+    log    ${listC[0][1]}
+
+case-2-8-4
+    @{list}    create list    abc    Warn
+    log    ${list}
+
+case-2-9-2
+    随机字符    arg value
+
+case-2-9-3
+    ${getArg1}    随机字符-1    arg1value
+    log    ${getArg1}
+    ${getArg2}    随机字符-2    arg1value
+    log    ${getArg2}
+
+case-2-10-1
+    : FOR    ${i}    IN RANGE    10    #in range后面只有一个数字，0-n-1的序列
+    \    log    i=${i}
+    : FOR    ${j}    IN RANGE    1    10
+    \    log    ${j}
+    : FOR    ${k}    IN RANGE    10    1    -2
+    \    log    ${k}
+    : FOR    ${m}    IN    a    b    c
+    \    log    m=${m}
+    @{list}    create list    1    2    F
+    : FOR    ${n}    IN    @{list}
+    \    log    n=${n}
+    #双重循环
+    : FOR    ${i}    IN RANGE    3
+    \    log    i=${i}
+    \    ForJ    ${i}
+
+cae-2-10-2
+    ${a}    set variable    0
+    ${b}    set variable    5
+    #多行写法
+    run keyword if    ${a}>=1    log    1
+    ...    ELSE IF    ${b}<=4    log    2
+    ...    ELSE    log    3
+    #单行写法
+    run keyword if    ${a}>=1    No Operation
+    ...    ELSE    log    6
+
+*** Keywords ***
+ForJ
+    [Arguments]    ${arg1}
+    : FOR    ${j}    IN RANGE    2
+    \    log    arg=${arg1};j=${j}

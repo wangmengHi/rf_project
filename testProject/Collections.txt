@@ -1,0 +1,88 @@
+*** Settings ***
+Library           Collections
+
+*** Test Cases ***
+set to dictionary
+    ${dict}    create dictionary
+    set to dictionary    ${dict}    a=1    b=2    c=3
+    log    ${dict}
+
+append to list
+    ${list}    create list    a    b
+    append to list    ${list}    1    2
+    log    ${list}
+
+combine list
+    ${list1}    create list    a    b
+    ${list2}    create list    1    2
+    ${list}    combine lists    ${list1}    ${list2}
+    log    ${list}
+
+count value in list
+    #计算某一个值在列表中重复的次数
+    ${list}    create list    1    3    4    1
+    ${count}    count values in list    ${list}    1
+    log    ${count}
+
+dicionary should be equal
+    ${dict1}    create dictionary    a=1    b=2
+    ${dict2}    create dictionary    a=1    b=3
+    dictionaries should be equal    ${dict1}    ${dict2}
+
+dictionary should contain item
+    ${dict}    create dictionary    a=1    b=2
+    dictionary should contain item    ${dict}    a    1
+
+get dictionary items
+    ${dict1}    create dictionary    a=1    b=2
+    ${dict2}    create dictionary    c=3
+    ${dicts}    Get Dictionary Items    ${dict1}
+
+get from list
+    ${list}    create list    1    2    3    4
+    ${new_list}    get from list    ${list}    3
+    ${index}    get index from list    ${list}    2
+
+get match count
+    #返回一个字符在字符串中重复的次数
+    ${count}    get match count    aaacccbbb    a
+    log    ${count}
+
+get slice from list
+    ${list}    create list    1    2    3    4    5
+    ${new_list}    get slice from list    ${list}    1    4
+    log    ${new_list}
+
+insert into list
+    ${list}    create list    1    3    5
+    insert into list    ${list}    0    a
+    insert into list    ${list}    -1    b
+    log    ${list}
+
+keep in dictionary
+    ${dict}    create dictionary    a=1    b=2    c=3
+    keep in dictionary    ${dict}    a    c
+    log    ${dict}
+
+list should contain sub list
+    ${list}    create list    1    2    3    2
+    ${list2}    create list    2    3
+    list should contain sub list    ${list}    ${list2}
+    list should not contain duplicates    ${list}    2
+
+pop from dictionary
+    ${dict}    create dictionary    a=1    b=2    c=3
+    ${newdict}    pop from dictionary    ${dict}    c
+    log    ${newdict}
+    log    ${dict}
+
+remove duplicates
+    ${list}    create list    1    3    1
+    ${newlist}    remove duplicates    ${list}
+    log    ${newlist}
+
+sort list
+    ${list}    create list    1    3    2    1    5
+    ...    4
+    sort list    ${list}
+    log    ${list}

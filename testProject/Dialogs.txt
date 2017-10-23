@@ -1,0 +1,20 @@
+*** Settings ***
+Library           Dialogs
+
+*** Test Cases ***
+execute manual step
+    execute manual step    测试
+
+get selection from user
+    ${value}    get selection from user    标题    测试2    测试3
+    log    ${value}
+    #第一个参数是对话框的标题。
+    #以后参数为可选，选择一个，点击ok,则值传给${value}
+
+get value from user
+    ${rst}    get value from user    测试get value from user
+    log    ${rst}
+
+pause execution
+    pause execution    暂停测试
+    log    ok

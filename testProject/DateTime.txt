@@ -1,0 +1,38 @@
+*** Settings ***
+Library           DateTime
+
+*** Test Cases ***
+get current date
+    ${date}    Get Current Date
+    log    ${date}
+    ${data2}    Get Current Date    local    60
+    log    ${data2}
+
+convert date
+    ${date}    convert date    20171018
+    log    ${date}
+
+convert time
+    ${time}    convert time    100    timedelta
+    log    ${time}
+
+subtract date from date
+    ${time}    Subtract Date From Date    2014-05-28 12:05:52    2014-05-28 12:05:10
+    log    ${time}
+    #获取两个日期间的差值，单位是秒
+
+add time to date
+    ${time}    add time to date    2017-10-18 12:44:10    5 days
+    log    ${time}
+
+subtract time from date
+    ${time}    subtract time from date    2017-10-18 15:43:11    7days
+    log    ${time}
+
+add time to time
+    ${time}    add time to time    1 days    4 days
+    log    ${time}
+
+subtract time from time
+    ${time}    subtract time from time    4 days    7days
+    log    ${time}
