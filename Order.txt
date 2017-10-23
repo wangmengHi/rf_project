@@ -15,8 +15,8 @@ get_trade_detail
         ${data}        Get Request        api        /get_trade_detail?trade_no=01171019172565000004&no_check=1&login_uid=214441&div=3.9.0&source=1
         Should contain        ${data.content}        updatetime
         log        ${data.content}
-        ${result}        To Json        ${data.content}        #用to json转成json格式
-        log        ${result}
+        ${result1}        To Json        ${data.content}        #用to json转成json格式
+        log        ${result1}
 
 post_trade_order_and_pay
         ${data}        set Variable        {"sku_id":"608481","channel":"0","is_group_goods":"false","seller_uid":"97947","booking_source":"1","address_id":"30917","buyer_uid":"214441","gid":"90566727605656"}
