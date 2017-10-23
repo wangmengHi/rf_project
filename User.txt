@@ -9,7 +9,7 @@ Library               pymysql
 
 *** Test Cases ***
 login_account
-        ${data}        set Variable        {"mobilephone":"13121221234","countrycode":"86","password":"123456"}
+        ${data}        set Variable        {"mobilephone":"15971456284","countrycode":"86","password":"123456"}
         ${url}        set Variable        https://tmoses.ofashion.com.cn/login_account?no_check=1
         ${dict}        create Dictionary        Host=tmoses.ofashion.com.cn        Content-Type=application/json
         Create Session        login_account        https://tmoses.ofashion.com.cn        ${dict}
