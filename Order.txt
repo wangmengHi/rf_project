@@ -16,7 +16,7 @@ get_trade_detail
         Should contain        ${data.content}        updatetime
         log        ${data.content}
         ${result1}        To Json        ${data.content}        #用to json转成json格式
-        log        ${result1}
+        log        ${result2}
 
 post_trade_order_and_pay
         ${data}        set Variable        {"sku_id":"608481","channel":"0","is_group_goods":"false","seller_uid":"97947","booking_source":"1","address_id":"30917","buyer_uid":"214441","gid":"90566727605656"}
