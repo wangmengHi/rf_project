@@ -36,7 +36,7 @@ post_trade_sign
 
 post_trade_comment
         ${data}        set Variable        {"comment_star":4,"nounce":508919,"delivery_star":5,"trade_no":"03170928112536000005","seller_uid":"97947","sign":"8e05858a36a4c71b985312ddd6894e57","comment_content":"robotframework","service_star":5,"buyer_uid":"214441","gid":"10009160315909","desc_star":5}
-        ${url}        set Variable        https://tmoses.ofashion.com.cn/post_trade_comment?no_check=1&login_uid=214441
+        ${url}        set Variable        https://tmoses.ofashion.com.cn/post_trade_comment?no_check=1&login_uid=397763
         ${dict}        create Dictionary        Host=tmoses.ofashion.com.cn        Content-Type=application/json
         Create Session        post_trade_comment        https://tmoses.ofashion.com.cn        ${dict}
         ${result1}        Post Request        post_trade_comment        ${url}        ${data}        headers=${dict}
