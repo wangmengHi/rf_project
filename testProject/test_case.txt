@@ -2,8 +2,8 @@
 Library           requests    # robotframework-requests依赖这个request
 Library           RequestsLibrary    # 封装的http关键字用到此类库
 Library           DatabaseLibrary    # 操作数据库
-Library           pymysql    # 操作Mysql数据库
 Library           HttpLibrary    # 为了使用该库的json关键字,对json操作相当方便
+Library           Collections
 
 *** Variables ***
 ${host}           https://tmoses.ofashion.com.cn    #域名
@@ -20,12 +20,32 @@ mysql_connect
     should be equal    ${string[0][0]}    blue
     Disconnect From Database
 
-get_trade_detail_2
-    create session    session    ${host}    #创建一个连接到服务器的host
-    ${result}    get request    session    /get_trade_detail?trade_no=01171019172565000004&no_check=1&login_uid=214441&div=3.9.0&source=1    #发起get 请求
-    Should Be Equal As Strings    ${result.status_code}    200    #status_recode是否是200
+get_trade_detail
+    ${url}    set variable    ${host}
+    ${data}    set variable    /get_trade_detail?trade_no=01171019172565000004&no_check=1&login_uid=214441&div=3.9.0&source=1
+    ${result}    requests.get    ${url}    ${data}
+    Should Be Equal As Strings    ${result.status_code}    200    #断言1status_recode是否是200
     ${content}    to json    ${result.content}    #转换成json文本格式
     log    ${content}
     log    ${result.content}
-    should contain    ${content['original']['trade_detail']}    updatetime    #是否包含updatetime
-    should not be empty    ${content['original']['trade_detail']}    \    #某个字段是否为空
+    should contain    ${content}    original
+    should contain    ${content['original']}    trade_detail    time_line    module_seqence    #断言2是否包括某些字段
+    should not be empty    ${content['original']['trade_detail']}    \    #断言3个字段是否为空
+    should not be equal as strings    ${content['original']['time_line'][0]['time']}    null    #断言4下单时间是否为空
+
+post_trade_order_and_pay
+    [Documentation]    下单
+    ${url}    set variable    ${host}/post_trade_order_and_pay?no_check=1&login_uid=214441
+    ${params}    set variable    {"sku_id":"608481","channel":"0","is_group_goods":"false","seller_uid":"97947","booking_source":"1","address_id":"30917","buyer_uid":"214441","gid":"90566727605656"}
+    ${result}    requests.post    ${url}    ${params}
+    log    ${result.content}
+    ${content}    to json    ${result.content}
+    log    ${content}
+    ${trade_no}    set variable    ${content['original']['trade_no']}
+    should be equal as strings    ${content['original']['status']}    success    #断言1 status值是否是success
+    connect to database using custom params    pymysql    database='mfashion',user='mfashion',password='Mfashion888',host='rm-bp1d8y0t9t7umzt03o.mysql.rds.aliyuncs.com',port=3306
+    table must exist    trade_base
+    Check If Exists In Database    select * from trade_base where trade_no=${trade_no}    #断言2下单是否正常写库
+    ${query}    query    select * from trade_base where trade_no=${trade_no}
+    log    ${query}
+    disconnect from database
