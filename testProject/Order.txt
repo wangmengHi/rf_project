@@ -4,25 +4,39 @@ Library           requests
 Library           Collections
 Library           RequestsLibrary
 Library           DatabaseLibrary
+Library           demjson
 
 *** Variables ***
 ${domain}         https://tmoses.ofashion.com.cn    # 域名
+${uid}            34350259    #用户id
+${div}            3.9.0    # 版本号
+${source}         1    # 接口来源，1-iOS,2-android,3-h5
+${seller_div}     2.16.0    # 商家版本号
+${gid}            90566150605708    # 商品id
+${sku_id}         608684    # 规格id
 
 *** Test Cases ***
 post_trade_order_and_pay
-    ${param}    set Variable    {"sku_id":"608481","channel":"0","is_group_goods":"false","seller_uid":"97947","booking_source":"1","address_id":"30917","buyer_uid":"214441","gid":"90566727605656"}
-    ${url}    set Variable    https://tmoses.ofashion.com.cn/post_trade_order_and_pay?no_check=1&login_uid=214441
+    ${param}    set Variable    {"sku_id":"${sku_id}","channel":"0","is_group_goods":"false","seller_uid":"97947","booking_source":"1","address_id":"30938","buyer_uid":"${uid}","gid":"${gid}"}
+    ${url}    set Variable    ${domain}/post_trade_order_and_pay?no_check=1&login_uid=${uid}&div=${div}&source=${source}
     post_api    ${url}    ${param}
     log    ${result}
     判断返回值状态码    #调用关键字
     ${trade_no}    set variable    ${result['original']['trade_no']}
     set global variable    ${trade_no}    #设置成全局变量
     log    ${trade_no}
-    read_databse    #读库
+    read_database    #读库
     Check If Exists In Database    select * from trade_base where trade_no=${trade_no}
     ${query_result}    query    select * from trade_base where trade_no=${trade_no}
     log    ${query_result[0][22]}
     disconnect from database
+
+post_trade_cancel
+    trade_no参数化
+    ${data}    set Variable    {"trade_no":"${data_1_json}", "buyer_uid": "34350259","gid": "10152497953901", "seller_uid": "97947","trade_status": "1","sign": "1b88cddee581a040a10f3858cbc8f888","trade_cancel_code": 3, "nounce": "000000"}
+    ${url}    set Variable    ${domain}/post_trade_cancel?login_uid=${uid}&dim=02:00:00:00:00:00&networkType=WIFI&diu=359583076232513&sign=ad9ea97e9da4a1fb0e0bbb682c776047&source=2&did=1080,1920,Samsung%20SM-G9350,7.0&djb=2&format=json&div=3.9.0&nounce=000000&dic=android_developer&authid=397763
+    post_api    ${url}    ${data}
+    log    ${result[u'original'][u'status']}
 
 get_trade_detail
     ${url}    set variable    ${domain}/get_trade_detail?trade_no=01171019172565000004&no_check=1&login_uid=214441&div=3.9.0&source=1
@@ -30,23 +44,43 @@ get_trade_detail
     log    ${result}
     判断返回值状态码
 
-post_trade_sign
-    ${data}    set Variable    {"sign":"2f235dc8ff4c6b995b1e9a1ae9c10552","trade_no":"03170926203361000001","source":1,"nounce":93101}
-    ${url}    set Variable    https://tmoses.ofashion.com.cn/post_trade_sign?no_check=1&login_uid=214441
-    ${result1}    requests.post    ${url}    ${data}
-    log    ${result1}
-    ${result2}    To Json    ${result1.content}
-    log    ${result2[u'original'][u'status']}
+trade_delivery
+    ${data}    set Variable    {"seller_uid":"97947","accept":1,"out_warehouse_picture":[{"width":640,"path":"\/outPutImage\/20171106\/97947\/01171106203235000001\/531663567.769199.jpg","height":639}],"shopping_receipt":[{"width":1280,"path":"\/shoppingReceipt\/20171106\/97947\/01171106203235000001\/531663560.424301.jpg","height":1280}],"gid":"90566150605708","is_logistics_extension":false,"buyer_uid":"34350259","transport_id":"57","package_no":"71010785906976","trade_no":"01171109115024000004"}
+    log    ${data}
+    ${url}    set Variable    ${domain}:8006/post_trade_delivery?no_check=1&login_uid=97947&div=${seller_div}&source=${source}&authid=97947
+    post_api    ${url}    ${data}
+    判断返回值状态码
+    Should Be Equal As Strings    ${result["original"]["msg"]}    发货成功    #断言1 对比返回msg是否一致
 
 post_trade_comment
-    ${data}    set Variable    {"comment_star":4,"nounce":508919,"delivery_star":5,"trade_no":"03170928112536000005","seller_uid":"97947","sign":"8e05858a36a4c71b985312ddd6894e57","comment_content":"robotframework","service_star":5,"buyer_uid":"214441","gid":"10009160315909","desc_star":5}
-    ${url}    set Variable    https://tmoses.ofashion.com.cn/post_trade_comment?no_check=1&login_uid=397763
-    ${dict}    create Dictionary    Host=tmoses.ofashion.com.cn    Content-Type=application/json
-    Create Session    post_trade_comment    https://tmoses.ofashion.com.cn    ${dict}
-    ${result1}    Post Request    post_trade_comment    ${url}    ${data}    headers=${dict}
-    log    ${result1}
-    ${result2}    To Json    ${result1.content}
-    log    ${result2[u'original'][u'status']}
+    ${data}    set Variable    {"comment_star":4,"nounce":508919,"delivery_star":5,"trade_no":"01171109115024000004","seller_uid":"97947","sign":"8e05858a36a4c71b985312ddd6894e57","comment_content":"rrrrr","service_star":5,"buyer_uid":"${uid}","gid":"90566150605708","desc_star":5}
+    ${url}    set Variable    https://tmoses.ofashion.com.cn/post_trade_comment?no_check=1&login_uid=${uid}
+    post_api    ${url}    ${data}
+    判断返回值状态码
+
+delete_trade
+    ${data}    set Variable    {"trade_no": "01171108185214000001"}
+    ${url}    set Variable    ${domain}/delete_trade?no_check=1
+    post_api    ${url}    ${data}
+    判断返回值状态码
+
+post_trade_sign
+    ${data}    set variable    {"trade_no":"01171109115024000004","source":"${source}"}
+    ${url}    set Variable    ${domain}/post_trade_sign?no_check=1&login_uid=34350259
+    post_api    ${url}    ${data}
+    判断返回值状态码
+    log    ${result[u'original'][u'msg']}    #断言2 提示已签收
+
+receiv_trade
+    ${data}    set Variable    {"accept":1,"seller_uid":"97947","buyer_uid":"34350259","gid":"14334666200017","trade_no":"01171108185214000001"}    #post值
+    log    ${data}
+    ${url}    set Variable    ${domain}:8006/post_trade_accept?no_check=1&login_uid=97947&div=${seller_div}&source=${source}&authid=97947
+    post_api    ${url}    ${data}
+    判断返回值状态码
+    Should Be Equal As Strings    ${result["original"]["msg"]}    接单成功,等待买家支付!    #断言1 对比返回msg是否一致
+    read_database
+    execute sql string    update trade_base set trade_status=3 where trade_no=${trade_no}
+    Disconnect From Database
 
 *** Keywords ***
 post_api
@@ -55,16 +89,22 @@ post_api
     ${result}    to json    ${response.content}    #转成jsonUU
     set global variable    ${result}    #设置全局变量
 
-判断返回值状态码
-    should be equal as strings    ${result['original']['status']}    success    #判断返回值状态码是成功还是失败
-
 get_api
     [Arguments]    ${url}
     ${response}    requests.get    ${url}
     ${result}    to json    ${response.content}
     set global variable    ${result}
 
-read_databse
+判断返回值状态码
+    should be equal as strings    ${result['original']['status']}    success    #判断返回值状态码是成功还是失败
+
+read_database
     [Documentation]    \#读库
     Connect To Database Using Custom Params    pymysql    database='mfashion',user='mfashion',password='Mfashion888',host='rm-bp1d8y0t9t7umzt03o.mysql.rds.aliyuncs.com',port=3306
     Table Must Exist    trade_base    True
+
+trade_no参数化
+    ${data_1}    create_dictionary    trade_no=${trade_no}    #取公共参数trade_no
+    ${data_1_json}    evaluate    demjson.encode(${data_1})    demjson    #dict转成json
+    ${data_1_json}    to json    ${data_1_json}    #dict转成后变成字符串，所以需要再转一次
+    set global variable    ${data_1_json}
