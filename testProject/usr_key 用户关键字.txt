@@ -1,9 +1,0 @@
-*** Test Cases ***
-case_01 for关键字
-    for    10    # 调用for关键字
-
-*** Keywords ***
-for
-    [Arguments]    ${n}
-    :FOR    ${i}    IN RANGE    ${n}
-    \     log    ${i}

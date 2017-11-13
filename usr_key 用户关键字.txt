@@ -1,0 +1,16 @@
+*** Test Cases ***
+case_01
+    for \ 随机循环数    3    # 调用for关键字
+    ${result}    add 加法    4    9    #调用add关键字
+    log    ${result}
+
+*** Keywords ***
+for \ 随机循环数
+    [Arguments]    ${n}
+    :FOR    ${i}    IN RANGE    ${n}
+    \     log    ${i}
+
+add 加法
+    [Arguments]    ${a}    ${b}
+    ${result}    evaluate    ${a}+${b}
+    [Return]    ${result}    # 返回值
